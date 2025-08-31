@@ -12,9 +12,8 @@ public class TrainingSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private LocalDate sessionDate;
-
+    private String username;
+    private LocalDate sessionDate = LocalDate.now();
     private String notes;
 
     public TrainingSession() {}
@@ -33,5 +32,13 @@ public class TrainingSession {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
