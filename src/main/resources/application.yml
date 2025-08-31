@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: traininglog
+
+  datasource:
+    url: jdbc:h2:mem:traininglogdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
