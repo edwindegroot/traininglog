@@ -1,11 +1,10 @@
 package com.edwin.traininglog.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class TrainingSession {
@@ -15,6 +14,8 @@ public class TrainingSession {
     private String username;
     private LocalDate sessionDate = LocalDate.now();
     private String notes;
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExerciseSet> sets = new ArrayList<>();
 
     public TrainingSession() {}
 
@@ -40,5 +41,21 @@ public class TrainingSession {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<ExerciseSet> getSets() {
+        return sets;
+    }
+
+    public void setSets(List<ExerciseSet> sets) {
+        this.sets = sets;
     }
 }
