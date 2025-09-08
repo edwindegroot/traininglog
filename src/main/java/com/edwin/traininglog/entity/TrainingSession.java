@@ -1,5 +1,6 @@
 package com.edwin.traininglog.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ public class TrainingSession {
     private LocalDate sessionDate = LocalDate.now();
     private String notes;
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<ExerciseSet> sets = new ArrayList<>();
 
     public TrainingSession() {}

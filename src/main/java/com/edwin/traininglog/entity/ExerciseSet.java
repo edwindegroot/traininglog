@@ -1,5 +1,6 @@
 package com.edwin.traininglog.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -18,6 +19,7 @@ public class ExerciseSet {
 
     @ManyToOne
     @JoinColumn(name = "session_id")
+    @JsonBackReference
     private TrainingSession session;
 
     public Long getId() {
