@@ -2,9 +2,7 @@ package com.edwin.traininglog.service;
 
 import com.edwin.traininglog.entity.TrainingSession;
 import com.edwin.traininglog.repository.TrainingSessionRepository;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,15 +19,15 @@ public class TrainingSessionService {
     }
 
     public List<TrainingSession> queryTrainingSessions(String user) {
-        TrainingSession trainingSession = new TrainingSession();
-        trainingSession.setUsername(user);
-        Example<TrainingSession> example = Example.of(trainingSession);
-        return repository.findAll(example);
+        return repository.findByUsername(user);
     }
 
-    @Transactional(readOnly = true)
     public TrainingSession get(long id) {
         return repository.findById(id).orElseThrow(RuntimeException::new);
+    }
+
+    public void delete(long id) {
+        repository.deleteById(id);
     }
 }
 

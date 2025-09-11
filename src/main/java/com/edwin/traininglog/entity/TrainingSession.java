@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,9 +14,9 @@ public class TrainingSession {
     private String username;
     private LocalDate sessionDate = LocalDate.now();
     private String notes;
-    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
-    private List<ExerciseSet> sets = new ArrayList<>();
+    private List<ExerciseSet> sets;
 
     public TrainingSession() {}
 
