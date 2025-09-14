@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Training Log</title>
+</head>
+<body>
+<h1>Training Log</h1>
+
+<form id="sessionForm">
+    <input type="text" id="notes" placeholder="Notes" required />
+
+    <select id="exerciseList">
+    </select>
+    <button type="submit">Save Session</button>
+</form>
+
+<h2>Sessions</h2>
+<ul id="sessions"></ul>
+
+<script>
+    const form = document.getElementById("sessionForm");
+    const list = document.getElementById("sessions");
+    const select = document.getElementById("exerciseList");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const notes = document.getElementById("notes").value;
+      const selectedOption = select.options[select.selectedIndex];
+      console.log(selectedOption.value)
+
+      await fetch("/api/training-sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            notes: notes,
+            username: "1"
+         })
+      });
+
+      loadSessions();
+    });
+
+    async function loadSessions() {
+      const res = await fetch("/api/training-sessions/by-user/1");
+      const data = await res.json();
+
+      list.innerHTML = "";
+      data.forEach(s => {
+        const li = document.createElement("li");
+        li.textContent = `${s.sessionDate || "No date"}: ${s.notes}`;
+        list.appendChild(li);
+      });
+    }
+
+    async function loadExercises() {
+      const res = await fetch("/api/exercises");
+      const data = await res.json();
+      console.log(data)
+      data.forEach(exercise => exerciseList.appendChild(new Option(exercise.name, exercise.id)))
+    }
+
+    loadExercises();
+    loadSessions();
+</script>
+</body>
+</html>
