@@ -9,8 +9,7 @@ public class ExerciseSet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer setNumber;
-    private Integer reps;
+    private Integer repetitions;
     private Double weight;
 
     @ManyToOne
@@ -28,22 +27,6 @@ public class ExerciseSet {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Integer getSetNumber() {
-        return setNumber;
-    }
-
-    public void setSetNumber(Integer setNumber) {
-        this.setNumber = setNumber;
-    }
-
-    public Integer getReps() {
-        return reps;
-    }
-
-    public void setReps(Integer reps) {
-        this.reps = reps;
     }
 
     public Double getWeight() {
@@ -68,5 +51,13 @@ public class ExerciseSet {
 
     public void setSession(TrainingSession session) {
         this.session = session;
+    }
+
+    public Integer getRepetitions() {
+        return repetitions;
+    }
+
+    public void setRepetitions(Integer repetitions) {
+        this.repetitions = repetitions;
     }
 }

@@ -12,8 +12,20 @@
 
     <select id="exerciseList">
     </select>
+
+     <label for="reps">Repetitions:</label>
+    <input type="number" id="reps" name="reps" min="1" max="1000">
+
+    <label for="weight">Weight:</label>
+    <input type="number" id="weight" name="weight" min="1" max="1000"> 
+
+      <button type="button" onclick="addSet()">Add Set</button>
+
     <button type="submit">Save Session</button>
 </form>
+
+<h2>Current session</h2>
+<ul id="setsList"></ul>
 
 <h2>Sessions</h2>
 <ul id="sessions"></ul>
@@ -21,25 +33,45 @@
 <script>
     const form = document.getElementById("sessionForm");
     const list = document.getElementById("sessions");
+    const setsList = document.getElementById("setsList")
     const select = document.getElementById("exerciseList");
+    const sets = []
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const notes = document.getElementById("notes").value;
-      const selectedOption = select.options[select.selectedIndex];
-      console.log(selectedOption.value)
-
+      console.log(sets);
+      
       await fetch("/api/training-sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             notes: notes,
-            username: "1"
+            username: "1",
+            sets: sets
          })
       });
-
+      setsList.innerHTML="";
       loadSessions();
     });
+
+    function addSet() {
+      console.log("Hello from add set")
+      const reps = Number(document.getElementById("reps").value);
+      const weight = Number(document.getElementById("weight").value);
+      const selectedOption = select.options[select.selectedIndex];
+      const exercise = {id: Number(selectedOption.value)};
+      const set = {
+        repetitions: reps,
+        weight: weight,
+        exercise: exercise
+      }
+      console.log(set);
+      sets.push(set);
+      const li = document.createElement("li")
+      li.textContent = `${selectedOption.textContent}: ${set.repetitions}x${set.weight}kg`
+      setsList.appendChild(li)
+    }
 
     async function loadSessions() {
       const res = await fetch("/api/training-sessions/by-user/1");

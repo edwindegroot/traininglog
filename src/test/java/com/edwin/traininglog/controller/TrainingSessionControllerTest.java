@@ -61,10 +61,10 @@ class TrainingSessionControllerTest {
         assertNotNull(savedSession);
         assertEquals("Chest day", savedSession.getNotes());
         assertEquals(4, savedSession.getSets().size());
-        assertEquals(5, savedSession.getSets().get(0).getReps());
-        assertEquals(8, savedSession.getSets().get(1).getReps());
-        assertEquals(8, savedSession.getSets().get(2).getReps());
-        assertEquals(8, savedSession.getSets().get(3).getReps());
+        assertEquals(5, savedSession.getSets().get(0).getRepetitions());
+        assertEquals(8, savedSession.getSets().get(1).getRepetitions());
+        assertEquals(8, savedSession.getSets().get(2).getRepetitions());
+        assertEquals(8, savedSession.getSets().get(3).getRepetitions());
         assertEquals(100.0, savedSession.getSets().get(0).getWeight());
         assertEquals(90.0, savedSession.getSets().get(1).getWeight());
         assertEquals(90.0, savedSession.getSets().get(2).getWeight());
