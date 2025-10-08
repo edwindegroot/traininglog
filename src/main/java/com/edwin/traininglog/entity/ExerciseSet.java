@@ -12,7 +12,7 @@ public class ExerciseSet {
     private Integer repetitions;
     private Double weight;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "exercise_id")
     private Exercise exercise;
 

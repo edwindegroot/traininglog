@@ -8,18 +8,18 @@
 <h1>Training Log</h1>
 
 <form id="sessionForm">
-    <input type="text" id="notes" placeholder="Notes" required />
+    <input type="text" id="notes" placeholder="Notes" required/>
 
     <select id="exerciseList">
     </select>
 
-     <label for="reps">Repetitions:</label>
+    <label for="reps">Repetitions:</label>
     <input type="number" id="reps" name="reps" min="1" max="1000">
 
     <label for="weight">Weight:</label>
-    <input type="number" id="weight" name="weight" min="1" max="1000"> 
+    <input type="number" id="weight" name="weight" min="1" max="1000">
 
-      <button type="button" onclick="addSet()">Add Set</button>
+    <button type="button" onclick="addSet()">Add Set</button>
 
     <button type="submit">Save Session</button>
 </form>
@@ -28,64 +28,82 @@
 <ul id="setsList"></ul>
 
 <h2>Sessions</h2>
-<ul id="sessions"></ul>
+<div id="sessions"></div>
 
 <script>
     const form = document.getElementById("sessionForm");
-    const list = document.getElementById("sessions");
+    const sessions = document.getElementById("sessions");
     const setsList = document.getElementById("setsList")
     const select = document.getElementById("exerciseList");
     const sets = []
 
     form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const notes = document.getElementById("notes").value;
-      console.log(sets);
-      
-      await fetch("/api/training-sessions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            notes: notes,
-            username: "1",
-            sets: sets
-         })
-      });
-      setsList.innerHTML="";
-      loadSessions();
+        e.preventDefault();
+        const notes = document.getElementById("notes").value;
+        console.log(sets);
+
+        await fetch("/api/training-sessions", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                notes: notes,
+                username: "1",
+                sets: sets
+            })
+        });
+        setsList.innerHTML = "";
+        loadSessions();
     });
 
     function addSet() {
-      console.log("Hello from add set")
-      const reps = Number(document.getElementById("reps").value);
-      const weight = Number(document.getElementById("weight").value);
-      const selectedOption = select.options[select.selectedIndex];
-      const exercise = {id: Number(selectedOption.value)};
-      const set = {
-        repetitions: reps,
-        weight: weight,
-        exercise: exercise
-      }
-      console.log(set);
-      sets.push(set);
-      const li = document.createElement("li")
-      li.textContent = `${selectedOption.textContent}: ${set.repetitions}x${set.weight}kg`
-      setsList.appendChild(li)
+        console.log("Hello from add set changed")
+        const reps = Number(document.getElementById("reps").value);
+        const weight = Number(document.getElementById("weight").value);
+        const selectedOption = select.options[select.selectedIndex];
+        const exercise = {id: Number(selectedOption.value)};
+        const set = {
+            repetitions: reps,
+            weight: weight,
+            exercise: exercise
+        }
+        console.log(set);
+        sets.push(set);
+        const li = document.createElement("li")
+        li.textContent = `${selectedOption.textContent}: ${set.repetitions}x${set.weight}kg`
+        setsList.appendChild(li)
     }
 
     async function loadSessions() {
-      const res = await fetch("/api/training-sessions/by-user/1");
-      const data = await res.json();
+        const res = await fetch("/api/training-sessions/by-user/1");
+        const data = await res.json();
 
-      list.innerHTML = "";
-      data.forEach(s => {
-        const li = document.createElement("li");
-        li.textContent = `${s.sessionDate || "No date"}: ${s.notes}`;
-        list.appendChild(li);
-      });
+        sessions.innerHTML = data.map(session => `
+        <div>
+      <div>
+        <h3>${session.sessionDate}</h3>
+        <p><em>${session.notes}</em></p>
+        <table>
+          <thead>
+            <tr><th>Exercise</th><th>Reps</th><th>Weight (kg)</th></tr>
+          </thead>
+          <tbody>
+            ${session.sets.map(set => `
+              <tr>
+                <td>${set.exercise.name}</td>
+                <td>${set.repetitions}</td>
+                <td>${set.weight}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    \`
+        </div>
+        `
+        ).join("")
     }
 
-    async function loadExercises() {
+     async function loadExercises() {
       const res = await fetch("/api/exercises");
       const data = await res.json();
       console.log(data)

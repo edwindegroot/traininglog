@@ -40,10 +40,10 @@ class TrainingSessionControllerTest {
           "notes": "Chest day",
           "username": "1",
           "sets": [
-            { "exercise": { "id": %d }, "reps": 5, "weight": 100.0 },
-            { "exercise": { "id": %d }, "reps": 8, "weight": 90.0 },
-            { "exercise": { "id": %d }, "reps": 8, "weight": 90.0 },
-            { "exercise": { "id": %d }, "reps": 8, "weight": 90.0 }
+            { "exercise": { "id": %d }, "repetitions": 5, "weight": 100.0 },
+            { "exercise": { "id": %d }, "repetitions": 8, "weight": 90.0 },
+            { "exercise": { "id": %d }, "repetitions": 8, "weight": 90.0 },
+            { "exercise": { "id": %d }, "repetitions": 8, "weight": 90.0 }
           ]
         }
         """.formatted(benchId, benchId, benchId, benchId);
