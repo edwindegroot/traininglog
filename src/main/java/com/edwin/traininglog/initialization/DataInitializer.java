@@ -2,15 +2,17 @@ package com.edwin.traininglog.initialization;
 
 import com.edwin.traininglog.entity.Exercise;
 import com.edwin.traininglog.repository.ExerciseRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
 @SuppressWarnings("unused")
 public class DataInitializer implements CommandLineRunner {
-    @Autowired
-    private ExerciseRepository exerciseRepository;
+    private final ExerciseRepository exerciseRepository;
+
+    public DataInitializer(ExerciseRepository exerciseRepository) {
+        this.exerciseRepository = exerciseRepository;
+    }
 
     @Override
     public void run(String... args) throws Exception {
