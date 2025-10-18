@@ -42,6 +42,8 @@ public class ScheduledTasks {
                     "{} submitting raw training log with id {}",
                     dateFormat.format(new Date()), log.getId()
             );
+            log.setStatus(RawTrainingLog.Status.IN_PROGRESS);
+            rawTrainingLogService.save(log);
             executorService.submit(() -> process(log));
         }
     }

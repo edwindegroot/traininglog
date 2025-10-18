@@ -67,7 +67,7 @@ public class AITrainingLogInterpreter {
         Map<String, Object> bodyMap = new HashMap<>();
         bodyMap.put("model", "mistral");
         bodyMap.put("prompt", fullPrompt);
-        bodyMap.put("stream", "false");
+        bodyMap.put("stream", false);
 
         WebClient webClient = WebClient.builder()
                 .baseUrl("http://localhost:11434/api/")
@@ -80,7 +80,7 @@ public class AITrainingLogInterpreter {
                 .block(Duration.ofMinutes(2));
 
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = null;
+        JsonNode root;
         try {
             root = mapper.readTree(jsonResponse);
         } catch (JsonProcessingException e) {
@@ -89,7 +89,13 @@ public class AITrainingLogInterpreter {
             return new ArrayList<>();
         }
         String aiResponse = root.path("response").asText();
-        return getTrainingSessions(aiResponse);
+
+        try {
+            return getTrainingSessions(aiResponse);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     private List<TrainingSession> getTrainingSessions(String aiResponse) {
@@ -134,6 +140,7 @@ public class AITrainingLogInterpreter {
                     set.setExercise(exercise);
                     set.setRepetitions(reps);
                     set.setWeight(weight);
+                    if (session.getSets() == null) session.setSets(new ArrayList<>());
                     session.getSets().add(set);
                 }
             }

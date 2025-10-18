@@ -40,7 +40,7 @@ public class RawTrainingLog extends BaseEntity {
 
     public enum Status {
         PENDING,
+        IN_PROGRESS,
         PROCESSED,
-        FAILED
     }
 }
