@@ -3,6 +3,7 @@ package com.edwin.traininglog.backgroundtasks;
 import com.edwin.traininglog.entity.Exercise;
 import com.edwin.traininglog.entity.ExerciseSet;
 import com.edwin.traininglog.entity.TrainingSession;
+import com.edwin.traininglog.service.ExerciseService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +22,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 public class AITrainingLogInterpreter {
-    private final String promptTemplate = """
+    private static final String PROMPT_TEMPLATE = """
             You are a workout log parser.
             Extract each training session into lines using this format:
 
@@ -30,7 +31,9 @@ public class AITrainingLogInterpreter {
 
             Rules:
             - Always start each session with a Notes line. If no notes are present, output ""Notes |"".
-            - Use PascalCase for exercise names (e.g., BenchPress, OverheadPress).
+            - Notes should be constructed from the general text that is in the general text besides the sets, exercise and reps.
+            - Exercise names should be translated to one of the following options (EXACT MATCH): %s
+            - If an exercise is not in the list just mentioned, ignore it.
             - Only output lines, no explanations.
 
             Here follows an example for you:
@@ -43,26 +46,30 @@ public class AITrainingLogInterpreter {
             Overhead press: 3 sets of 5 reps with 100kg
             Deadlift: 5 sets of 5 reps with 140kg
 
-            Example output:
+            Example output (IMPORTANT: exercise names may differ from the actual exercise names you should use, as mentioned in the rules):
             Session 1 | Notes | felt heavy overall
-            Session 1 | BenchPress | Sets=3 | Reps=5 | WeightKg=100
-            Session 1 | Squat | Sets=5 | Reps=5 | WeightKg=140
+            Session 1 | benchPress | Sets=3 | Reps=5 | WeightKg=100
+            Session 1 | squat | Sets=5 | Reps=5 | WeightKg=140
             Session 2 | Notes | great form today
-            Session 2 | OverheadPress | Sets=3 | Reps=5 | WeightKg=100
-            Session 2 | Deadlift | Sets=5 | Reps=5 | WeightKg=140
+            Session 2 | benchPress | Sets=3 | Reps=5 | WeightKg=100
+            Session 2 | squat | Sets=5 | Reps=5 | WeightKg=140
+            
+            Available exercise names are
 
-            Now generate the lines as described based on this raw text:
+            Now generate the lines as described based on this raw text: %s
             """;
 
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
-    private final ObjectMapper mapper;
+    private final ExerciseService exerciseService;
 
-    public AITrainingLogInterpreter(ObjectMapper mapper) {
-        this.mapper = mapper;
+    public AITrainingLogInterpreter(ExerciseService exerciseService) {
+        this.exerciseService = exerciseService;
     }
 
     public List<TrainingSession> interpret(String text) {
-        String fullPrompt = promptTemplate + "\n" + text;
+        Map<String, Exercise> nameToExerciseMap = new HashMap<>();
+        exerciseService.queryExercises().forEach(e -> nameToExerciseMap.put(e.getName(), e));
+        String fullPrompt = PROMPT_TEMPLATE.formatted(new ArrayList<>(nameToExerciseMap.keySet()), text);
 
         Map<String, Object> bodyMap = new HashMap<>();
         bodyMap.put("model", "mistral");
@@ -91,14 +98,15 @@ public class AITrainingLogInterpreter {
         String aiResponse = root.path("response").asText();
 
         try {
-            return getTrainingSessions(aiResponse);
+            return getTrainingSessions(aiResponse, nameToExerciseMap);
         } catch (Exception e) {
             logger.error(e.getMessage());
             return new ArrayList<>();
         }
     }
 
-    private List<TrainingSession> getTrainingSessions(String aiResponse) {
+    private List<TrainingSession> getTrainingSessions(String aiResponse,
+                                                      Map<String, Exercise> exerciseMap) {
         String[] lines = aiResponse.split("\n");
 
         List<TrainingSession> sessions = new ArrayList<>();
@@ -123,14 +131,13 @@ public class AITrainingLogInterpreter {
             if ("Notes".equalsIgnoreCase(partType)) {
                 session.setNotes(parts[2].trim());
             } else {
-                String exerciseStr = partType;
                 int sets = Integer.parseInt(parts[2].trim().replace("Sets=", ""));
                 int reps = Integer.parseInt(parts[3].trim().replace("Reps=", ""));
                 double weight = Double.parseDouble(parts[4].trim().replace("WeightKg=", ""));
 
-                Exercise exercise = new Exercise();
+                Exercise exercise;
                 try {
-//                    exercise = Exercise.parse(exerciseStr);
+                    exercise = exerciseMap.get(partType);
                 } catch (IllegalArgumentException e) {
                     continue; // Unknown exercise
                 }
