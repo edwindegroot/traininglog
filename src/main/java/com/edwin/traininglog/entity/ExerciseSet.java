@@ -11,6 +11,7 @@ public class ExerciseSet extends BaseEntity {
 
     private Integer repetitions;
     private Double weight;
+    private String username;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "exercise_id")
@@ -59,5 +60,13 @@ public class ExerciseSet extends BaseEntity {
 
     public void setRepetitions(Integer repetitions) {
         this.repetitions = repetitions;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

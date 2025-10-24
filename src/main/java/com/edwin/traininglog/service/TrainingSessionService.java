@@ -14,8 +14,10 @@ public class TrainingSessionService {
         this.repository = repository;
     }
 
-    public TrainingSession saveTrainingSession(TrainingSession exercise) {
-        return repository.save(exercise);
+    public TrainingSession saveTrainingSession(TrainingSession session) {
+        String username = session.getUsername();
+        session.getSets().forEach(set -> set.setUsername(username));
+        return repository.save(session);
     }
 
     public List<TrainingSession> queryTrainingSessions(String user) {
